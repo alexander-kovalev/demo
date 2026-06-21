@@ -761,7 +761,7 @@
             const checked = selected.has(o.id);
             return {
               ...o,
-              cat: o.cat === null ? 'null' : o.cat,
+              cat: o.cat === null ? '' : o.cat,
               checked,
               simple: !showColumns,
               title: checked ? 'Click to deselect' : 'Click to select',
