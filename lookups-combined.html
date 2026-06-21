@@ -50,6 +50,24 @@
         flex-direction: column;
         gap: 12px;
       }
+      .lookup {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: visible;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+      }
+      .lookup-label {
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #2563eb;
+        background: #eff6ff;
+        border-radius: 6px;
+        padding: 4px 10px;
+        margin: 12px 0 0 24px;
+      }
       .mount {
         min-height: 0;
       }
@@ -82,8 +100,14 @@
     </header>
 
     <div class="stack">
-      <div id="mount-v1" class="mount"><div class="loading">Loading v1…</div></div>
-      <div id="mount-v2" class="mount"><div class="loading">Loading v2…</div></div>
+      <div class="lookup">
+        <span class="lookup-label">v1</span>
+        <div id="mount-v1" class="mount"><div class="loading">Loading v1…</div></div>
+      </div>
+      <div class="lookup">
+        <span class="lookup-label">v2</span>
+        <div id="mount-v2" class="mount"><div class="loading">Loading v2…</div></div>
+      </div>
     </div>
 
     <script>
