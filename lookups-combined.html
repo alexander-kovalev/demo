@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lookups — Combined (no frames)</title>
+    <script src="./support.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f7f8fa;
+        font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+        color: #1f2937;
+        padding: 48px 24px;
+      }
+      header {
+        max-width: 1200px;
+        margin: 0 auto 28px;
+      }
+      header h1 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0 0 4px;
+      }
+      header p {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+      }
+      header a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      header a:hover {
+        text-decoration: underline;
+      }
+      .stack {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .mount {
+        min-height: 0;
+      }
+      /* support.js injects FULL_PAGE_CSS (html,body,#dc-root,.sc-host{height:100%})
+         and each demo's #ss-root uses min-height:100vh. Override both so the
+         mounted lookups size to content instead of stretching to full height. */
+      .mount,
+      .mount .sc-host {
+        height: auto !important;
+      }
+      .mount #ss-root,
+      .mount [data-dc-tpl="4"] {
+        min-height: 0 !important;
+        padding: 12px 24px !important;
+      }
+      .loading {
+        padding: 32px 18px;
+        color: #94a3b8;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Lookups — Combined View</h1>
+      <p>
+        Both lookup demos mounted on one page, no iframes.
+        <a href="./index.html">&larr; Back to index</a>
+      </p>
+    </header>
+
+    <div class="stack">
+      <div id="mount-v1" class="mount"><div class="loading">Loading v1…</div></div>
+      <div id="mount-v2" class="mount"><div class="loading">Loading v2…</div></div>
+    </div>
+
+    <script>
+      // Each lookup demo is a standalone dc-runtime document with its own
+      // <x-dc> template + <script data-dc-script> logic. support.js only ever
+      // boots the FIRST <x-dc> in a document, so we can't just paste two of
+      // them inline. Instead we use the runtime API support.js exposes on
+      // window (__dcUpdate to register a named component's html/js, getDC to
+      // get its React component) and mount each demo as its own React root.
+      //
+      // The two source files both define `class Component` — that's fine: each
+      // is eval'd in an isolated Function scope inside the runtime, so they
+      // don't collide. We register them under distinct names (LookupV1 /
+      // LookupV2) so the registry keeps them separate.
+      (function () {
+        var DEMOS = [
+          { name: "LookupV1", url: "./lookup-table-v1.html", mount: "mount-v1" },
+          { name: "LookupV2", url: "./lookup-table-v2.html", mount: "mount-v2" },
+        ];
+
+        // Pull the <x-dc> template and <script data-dc-script> body out of a
+        // fetched source document.
+        function parseSource(text) {
+          var doc = new DOMParser().parseFromString(text, "text/html");
+          var dc = doc.querySelector("x-dc");
+          var scriptEl = doc.querySelector("script[data-dc-script]");
+          return {
+            template: dc ? dc.innerHTML : "",
+            js: scriptEl ? scriptEl.textContent || "" : "",
+            props: scriptEl ? scriptEl.getAttribute("data-props") : null,
+          };
+        }
+
+        // Wait until support.js has finished loading React and assigned its
+        // API onto window (it does this asynchronously after fetching React).
+        function whenRuntimeReady(cb) {
+          if (window.__dcUpdate && window.getDC && window.React && window.ReactDOM) {
+            return cb();
+          }
+          setTimeout(function () {
+            whenRuntimeReady(cb);
+          }, 30);
+        }
+
+        function mountDemo(demo) {
+          return fetch(demo.url)
+            .then(function (r) {
+              if (!r.ok) throw new Error("HTTP " + r.status + " for " + demo.url);
+              return r.text();
+            })
+            .then(function (text) {
+              var parsed = parseSource(text);
+              if (!parsed.template) {
+                throw new Error("no <x-dc> template found in " + demo.url);
+              }
+              // Register this demo as a named component in the runtime.
+              if (parsed.props) {
+                window.__dcUpdate(demo.name, "props", parsed.props, false);
+              }
+              window.__dcUpdate(demo.name, "html", parsed.template, false);
+              if (parsed.js) {
+                window.__dcUpdate(demo.name, "js", parsed.js, false);
+              }
+
+              var host = document.getElementById(demo.mount);
+              host.innerHTML = "";
+              var Comp = window.getDC(demo.name);
+              var el = window.React.createElement(Comp, null);
+              if (window.ReactDOM.createRoot) {
+                window.ReactDOM.createRoot(host).render(el);
+              } else {
+                window.ReactDOM.render(el, host);
+              }
+            })
+            .catch(function (err) {
+              console.error("[combined] failed to mount", demo.name, err);
+              var host = document.getElementById(demo.mount);
+              if (host) {
+                host.innerHTML =
+                  '<div class="loading">Failed to load ' +
+                  demo.url +
+                  " — " +
+                  (err && err.message ? err.message : err) +
+                  "</div>";
+              }
+            });
+        }
+
+        whenRuntimeReady(function () {
+          DEMOS.forEach(mountDemo);
+        });
+      })();
+    </script>
+  </body>
+</html>

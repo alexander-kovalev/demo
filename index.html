@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lookup Demos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f7f8fa;
+        font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+        color: #1f2937;
+        padding: 64px 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .wrap {
+        width: 100%;
+        max-width: 640px;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        letter-spacing: -0.02em;
+      }
+      .sub {
+        font-size: 15px;
+        color: #6b7280;
+        margin: 0 0 32px;
+      }
+      .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        text-decoration: none;
+        color: inherit;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px 22px;
+        transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease,
+          transform 0.15s ease;
+      }
+      .card:hover {
+        border-color: #2563eb;
+        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+        transform: translateY(-1px);
+      }
+      .badge {
+        flex: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .meta {
+        flex: 1;
+        min-width: 0;
+      }
+      .meta .name {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 2px;
+      }
+      .meta .desc {
+        font-size: 13.5px;
+        color: #6b7280;
+        margin: 0;
+      }
+      .arrow {
+        flex: none;
+        color: #9ca3af;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Lookup Demos</h1>
+      <p class="sub">Searchable product catalog lookup table — version comparison.</p>
+
+        <a class="card" href="./lookups-combined.html">
+
+          <span class="meta">
+            <p class="name">Lookup Tables</p>
+            <p class="desc">Both lookup tables side by side on one page.</p>
+          </span>
+          <span class="arrow">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>
