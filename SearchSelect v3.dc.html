@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .ss-scroll::-webkit-scrollbar { width: 14px; height: 14px; }
+  .ss-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+  .ss-scroll::-webkit-scrollbar-thumb { background: #c7ccd1; border: 3px solid #f1f5f9; border-radius: 8px; }
+  .ss-scroll::-webkit-scrollbar-thumb:hover { background: #aeb4ba; }
+</style>
+</helmet>
+
+<div id="ss-root" ref="{{ setRoot }}" style="min-height:100vh;background:#f7f8fa;font-family:Inter,'Segoe UI',system-ui,-apple-system,sans-serif;color:#1f2937;padding:64px 48px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+
+  <template id="__bundler_thumbnail" data-bg-color="#f7f8fa">
+    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="800" fill="#f7f8fa"/>
+      <rect x="300" y="250" width="600" height="70" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+      <rect x="324" y="270" width="30" height="30" rx="7" fill="#2563eb"/>
+      <rect x="372" y="278" width="220" height="14" rx="7" fill="#94a3b8"/>
+      <rect x="300" y="340" width="600" height="210" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>
+      <rect x="324" y="372" width="34" height="34" rx="8" fill="#2563eb"/>
+      <rect x="378" y="382" width="300" height="14" rx="7" fill="#1f2937"/>
+      <rect x="324" y="430" width="34" height="34" rx="8" fill="#2563eb"/>
+      <rect x="378" y="440" width="260" height="14" rx="7" fill="#1f2937"/>
+      <rect x="324" y="488" width="34" height="34" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+      <rect x="378" y="498" width="280" height="14" rx="7" fill="#475569"/>
+    </svg>
+  </template>
+
+  <div style="width:100%;max-width:780px;">
+    <div style="font-size:13px;font-weight:600;color:#64748b;letter-spacing:.02em;text-transform:uppercase;margin-bottom:10px;">{{ fieldLabel }}</div>
+
+    <!-- FIELD (value display) -->
+    <div style="position:relative;">
+      <div style="display:flex;align-items:center;background:#fff;border:1px solid {{ fieldBorder }};border-radius:8px;padding:0 6px 0 14px;height:46px;box-shadow:0 1px 2px rgba(15,23,42,.04);">
+        <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+          <div style="width:18px;height:18px;border-radius:5px;background:{{ primary }};display:flex;align-items:center;justify-content:center;flex:none;margin-right:10px;"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </sc-if>
+        <div onClick="{{ toggleOpen }}" style="flex:1;font-size:14.5px;color:{{ valueColor }};font-weight:500;cursor:pointer;user-select:none;">{{ summaryText }}</div>
+        <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ clearAll }}" aria-label="Clear selection" title="Clear all selected" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;background:transparent;color:#94a3b8;cursor:pointer;border-radius:6px;transition:all .15s;" style-hover="background:#f1f5f9;color:#475569;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <div style="width:1px;height:22px;background:#e2e8f0;margin:0 4px;"></div>
+        </sc-if>
+        <button onClick="{{ toggleOpen }}" aria-label="Toggle options" title="Show options" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:transparent;color:#64748b;cursor:pointer;border-radius:6px;transition:background .15s;" style-hover="background:#f1f5f9;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="transform:rotate({{ caretRotate }});transition:transform .2s;"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+
+      <!-- PANEL: framed table with its own header -->
+      <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:54px;left:0;width:780px;max-width:96vw;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 14px 32px -10px rgba(15,23,42,.28),0 2px 6px rgba(15,23,42,.08);z-index:30;overflow:hidden;">
+
+        <!-- consolidated header: search + select all + count -->
+        <div style="padding:12px 14px;border-bottom:1px solid #eef1f4;background:#fafbfc;display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;display:flex;align-items:center;background:#fff;border:1px solid {{ searchBorder }};border-radius:7px;padding:0 10px;height:36px;transition:border-color .15s;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:#94a3b8;flex:none;"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input type="text" ref="{{ setSearchRef }}" value="{{ query }}" onInput="{{ onInput }}" onFocus="{{ onSearchFocus }}" onBlur="{{ onSearchBlur }}" placeholder="Search all columns…" title="Type to search" style="flex:1;border:none;outline:none;background:transparent;font:inherit;font-size:13.5px;color:#1f2937;padding:0 8px;" />
+            <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ clearQuery }}" aria-label="Clear search" title="Clear search" style="display:flex;border:none;background:transparent;color:#94a3b8;cursor:pointer;padding:2px;line-height:0;" style-hover="color:#475569;"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            </sc-if>
+          </div>
+          <div onClick="{{ toggleAll }}" title="{{ selectAllLabel }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;white-space:nowrap;">
+            <div style="{{ headBoxStyle }}">
+              <sc-if value="{{ allChecked }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+              <sc-if value="{{ someChecked }}" hint-placeholder-val="{{ false }}"><div style="width:9px;height:2.5px;background:#fff;border-radius:2px;"></div></sc-if>
+            </div>
+            <span style="font-size:12.5px;font-weight:600;color:#334155;">All</span>
+          </div>
+          <span style="font-size:12px;color:#94a3b8;white-space:nowrap;font-variant-numeric:tabular-nums;">{{ countLabel }}</span>
+        </div>
+
+        <!-- table -->
+        <div class="ss-scroll" style="max-height:344px;overflow:auto;">
+          <div style="min-width:680px;">
+            <!-- column headers -->
+            <div style="display:grid;grid-template-columns:{{ gridCols }};position:sticky;top:0;background:#f1f5f9;border-bottom:1px solid #e2e8f0;z-index:2;">
+              <div></div>
+              <div style="padding:10px 12px;font-size:11px;font-weight:700;color:#475569;text-align:right;">PSP #</div>
+              <div style="padding:10px 12px;font-size:11px;font-weight:700;color:#475569;">Product Description</div>
+              <div style="padding:10px 12px;font-size:11px;font-weight:700;color:#475569;text-align:right;">Mfr Code</div>
+              <div style="padding:10px 12px;font-size:11px;font-weight:700;color:#475569;">Pack Size</div>
+              <div style="padding:10px 12px;font-size:11px;font-weight:700;color:#475569;">Category</div>
+              <div style="padding:10px 12px;font-size:11px;font-weight:700;color:#475569;">Brand</div>
+            </div>
+            <!-- rows -->
+            <sc-for list="{{ rows }}" as="row" hint-placeholder-count="6">
+              <div onClick="{{ row.toggle }}" title="{{ row.title }}" style="{{ row.rowStyle }}" style-hover="background:#f1f6fe;">
+                <div style="display:flex;align-items:center;justify-content:center;padding-left:3px;">
+                  <div style="{{ row.boxStyle }}">
+                    <sc-if value="{{ row.checked }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                </div>
+                <div style="padding:10px 12px;font-size:13px;color:#475569;display:flex;align-items:center;justify-content:flex-end;font-variant-numeric:tabular-nums;">{{ row.psp }}</div>
+                <div style="padding:10px 12px;font-size:13.5px;color:#1f2937;font-weight:500;display:flex;align-items:center;">{{ row.desc }}</div>
+                <div style="padding:10px 12px;font-size:13px;color:#475569;display:flex;align-items:center;justify-content:flex-end;font-variant-numeric:tabular-nums;">{{ row.code }}</div>
+                <div style="padding:10px 12px;font-size:13px;color:#475569;display:flex;align-items:center;">{{ row.pack }}</div>
+                <div style="padding:10px 12px;font-size:13px;color:{{ row.catColor }};display:flex;align-items:center;">{{ row.cat }}</div>
+                <div style="padding:10px 12px;font-size:13px;color:#475569;display:flex;align-items:center;">{{ row.brand }}</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px;text-align:center;color:#94a3b8;font-size:14px;">
+                No products match “{{ query }}”
+                <div style="margin-top:10px;"><button onClick="{{ clearQuery }}" style="border:1px solid #d8dee6;background:#fff;border-radius:6px;padding:6px 14px;font:inherit;font-size:13px;color:#475569;cursor:pointer;" style-hover="background:#f1f5f9;">Clear search</button></div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:560},&quot;primary&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2563eb&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#2563eb&quot;,&quot;#1d4ed8&quot;,&quot;#0ea5e9&quot;,&quot;#7c3aed&quot;,&quot;#0f766e&quot;,&quot;#dc2626&quot;]},&quot;entityName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;products&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;fieldLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Product Catalog&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.data = [
+      { id: 1, psp: 2689, desc: 'WINE COOKING SHERRY', code: 520460, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+      { id: 2, psp: 2690, desc: 'WINE COOKING BURGUNDY', code: 520461, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+      { id: 3, psp: 2692, desc: 'VINEGAR WINE RED', code: 520420, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+      { id: 4, psp: 7715, desc: 'VINEGAR WHITE WINE', code: 520421, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+      { id: 5, psp: 2638, desc: 'GYRO SLICES RAW IQF', code: 20065, pack: '1/10 LB', cat: null, brand: 'GRECIAN D' },
+      { id: 6, psp: 2641, desc: 'GYRO CONE BEEF & LAMB', code: 20071, pack: '2/20 LB', cat: 'MEAT', brand: 'GRECIAN D' },
+      { id: 7, psp: 3102, desc: 'OLIVE OIL EXTRA VIRGIN', code: 118840, pack: '4/1 GAL', cat: 'OIL', brand: 'COLAVITA' },
+      { id: 8, psp: 3110, desc: 'OLIVE OIL POMACE BLEND', code: 118855, pack: '6/1 GAL', cat: 'OIL', brand: 'COLAVITA' },
+      { id: 9, psp: 4051, desc: 'FETA CHEESE CRUMBLES', code: 60412, pack: '4/5 LB', cat: 'DAIRY', brand: 'PRESIDENT' },
+      { id: 10, psp: 4072, desc: 'MOZZARELLA SHRED LMPS', code: 60498, pack: '4/5 LB', cat: 'DAIRY', brand: 'GALBANI' },
+      { id: 11, psp: 5203, desc: 'TOMATO PASTE 6/10', code: 88102, pack: '6/#10', cat: 'CANNED', brand: 'STANISLAUS' },
+      { id: 12, psp: 5219, desc: 'TOMATO CRUSHED GROUND', code: 88140, pack: '6/#10', cat: 'CANNED', brand: 'STANISLAUS' },
+      { id: 13, psp: 6610, desc: 'PITA BREAD 7 INCH', code: 41020, pack: '12/6 CT', cat: 'BAKERY', brand: 'KONTOS' },
+      { id: 14, psp: 6622, desc: 'PITA BREAD POCKETLESS', code: 41044, pack: '12/10 CT', cat: 'BAKERY', brand: 'KONTOS' },
+      { id: 15, psp: 7001, desc: 'CHICKEN BREAST BNLS SKLS', code: 30210, pack: '1/40 LB', cat: 'POULTRY', brand: 'TYSON' },
+      { id: 16, psp: 7044, desc: 'CHICKEN TENDERS BREADED', code: 30288, pack: '2/5 LB', cat: 'POULTRY', brand: 'TYSON' },
+      { id: 17, psp: 8120, desc: 'RICE BASMATI LONG GRAIN', code: 71200, pack: '1/25 LB', cat: 'GRAIN', brand: 'ROYAL' },
+      { id: 18, psp: 8134, desc: 'RICE JASMINE PREMIUM', code: 71244, pack: '1/25 LB', cat: 'GRAIN', brand: 'DYNASTY' },
+      { id: 19, psp: 9201, desc: 'GARLIC MINCED IN OIL', code: 99340, pack: '2/5 LB', cat: 'PRODUCE', brand: 'SPICE WLD' },
+      { id: 20, psp: 9255, desc: 'ONION POWDER GRANULATED', code: 99388, pack: '6/20 OZ', cat: 'SPICE', brand: 'SPICE WLD' },
+      { id: 21, psp: 1042, desc: 'SUGAR GRANULATED FINE', code: 12010, pack: '1/50 LB', cat: 'BAKING', brand: 'DOMINO' },
+      { id: 22, psp: 1058, desc: 'FLOUR ALL PURPOSE BLCHD', code: 12080, pack: '1/50 LB', cat: 'BAKING', brand: 'GOLD MDL' },
+      { id: 23, psp: 1190, desc: 'SALT KOSHER COARSE', code: 12190, pack: '12/3 LB', cat: 'SPICE', brand: 'DIAMOND' },
+      { id: 24, psp: 1224, desc: 'PEPPER BLACK GROUND', code: 12244, pack: '6/18 OZ', cat: 'SPICE', brand: 'MCCORMICK' },
+      { id: 25, psp: 1330, desc: 'BUTTER SOLIDS UNSALTED', code: 60710, pack: '1/36 LB', cat: 'DAIRY', brand: 'LAND O LK' },
+      { id: 26, psp: 1402, desc: 'EGGS WHOLE LIQUID', code: 60822, pack: '15/2 LB', cat: 'DAIRY', brand: 'PAPETTI' }
+    ];
+    this.state = { open: false, query: '', searchFocus: false, selected: new Set([1, 2, 3, 5, 7, 9]) };
+    this._onDocDown = this._onDocDown.bind(this);
+  }
+
+  componentDidMount() { document.addEventListener('mousedown', this._onDocDown); }
+  componentWillUnmount() { document.removeEventListener('mousedown', this._onDocDown); }
+  focusSearch() {
+    requestAnimationFrame(() => { if (this.searchInput) this.searchInput.focus(); });
+  }
+  _onDocDown(e) { if (this.root && !this.root.contains(e.target)) this.setState({ open: false }); }
+
+  toggle(id) {
+    this.setState(s => {
+      const sel = new Set(s.selected);
+      sel.has(id) ? sel.delete(id) : sel.add(id);
+      return { selected: sel };
+    });
+  }
+
+  filtered() {
+    const q = this.state.query.trim().toLowerCase();
+    if (!q) return this.data;
+    return this.data.filter(o =>
+      ['psp', 'desc', 'code', 'pack', 'cat', 'brand'].some(k => String(o[k] ?? '').toLowerCase().includes(q))
+    );
+  }
+
+  renderVals() {
+    const primary = this.props.primary || '#2563eb';
+    const entityName = this.props.entityName || 'products';
+    const { open, query, selected, searchFocus } = this.state;
+    const list = this.filtered();
+
+    const box = (checked, partial) =>
+      `width:18px;height:18px;border-radius:5px;flex:none;display:flex;align-items:center;justify-content:center;transition:all .12s;` +
+      (checked || partial ? `background:${primary};border:1px solid ${primary};` : `background:#fff;border:1.5px solid #cbd5e1;`);
+
+    const rows = list.map(o => {
+      const checked = selected.has(o.id);
+      const hasCat = o.cat !== null;
+      return {
+        ...o,
+        checked,
+        cat: hasCat ? o.cat : '—',
+        catColor: hasCat ? '#475569' : '#cbd5e1',
+        title: checked ? 'Click to deselect' : 'Click to select',
+        toggle: () => this.toggle(o.id),
+        boxStyle: box(checked, false),
+        rowStyle: `display:grid;grid-template-columns:44px 64px minmax(150px,1fr) 110px 92px 100px 104px;cursor:pointer;border-bottom:1px solid #f1f5f9;border-left:3px solid ${checked ? primary : 'transparent'};transition:background .1s;background:${checked ? '#f6fafe' : '#fff'};`
+      };
+    });
+
+    const count = selected.size;
+    const allChecked = list.length > 0 && list.every(o => selected.has(o.id));
+    const someChecked = !allChecked && list.some(o => selected.has(o.id));
+
+    return {
+      primary,
+      entityName,
+      fieldLabel: this.props.fieldLabel || 'Product Catalog',
+      fieldBorder: open ? primary : '#cbd5e1',
+      searchBorder: searchFocus ? primary : '#d8dee6',
+      hasSelection: count > 0,
+      valueColor: count > 0 ? '#1f2937' : '#94a3b8',
+      summaryText: count > 0 ? `${count} ${entityName} selected` : `Select ${entityName}…`,
+      query,
+      hasQuery: query.length > 0,
+      open,
+      caretRotate: open ? '180deg' : '0deg',
+      rows,
+      noResults: list.length === 0,
+      allChecked,
+      someChecked,
+      headBoxStyle: box(allChecked, someChecked),
+      selectAllLabel: allChecked ? 'Deselect all' : 'Select all',
+      countLabel: `${count} of ${this.data.length}`,
+      gridCols: '44px 64px minmax(150px,1fr) 110px 92px 100px 104px',
+      toggleOpen: (e) => { e.preventDefault(); this.setState(s => { const open = !s.open; if (open) this.focusSearch(); return { open }; }); },
+      onInput: (e) => this.setState({ query: e.target.value, open: true }),
+      onSearchFocus: () => this.setState({ searchFocus: true }),
+      onSearchBlur: () => this.setState({ searchFocus: false }),
+      clearQuery: (e) => { e.stopPropagation(); this.setState({ query: '' }); },
+      clearAll: (e) => { e.stopPropagation(); this.setState({ selected: new Set() }); },
+      setRoot: (el) => { this.root = el; },
+      setSearchRef: (el) => { this.searchInput = el; },
+      toggleAll: () => {
+        this.setState(s => {
+          const sel = new Set(s.selected);
+          const cur = this.filtered();
+          const all = cur.length > 0 && cur.every(o => sel.has(o.id));
+          cur.forEach(o => all ? sel.delete(o.id) : sel.add(o.id));
+          return { selected: sel };
+        });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
