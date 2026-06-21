@@ -17,7 +17,12 @@
       body {
         margin: 0;
         background: #f7f8fa;
-        font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+        font-family:
+          Inter,
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
         color: #1f2937;
         padding: 48px 24px;
       }
@@ -92,21 +97,21 @@
   </head>
   <body>
     <header>
-      <h1>Lookups — Combined View</h1>
-      <p>
-        Both lookup demos mounted on one page, no iframes.
-        <a href="./index.html">&larr; Back to index</a>
-      </p>
+      <h1>Lookup Tables</h1>
     </header>
 
     <div class="stack">
       <div class="lookup">
         <span class="lookup-label">v1</span>
-        <div id="mount-v1" class="mount"><div class="loading">Loading v1…</div></div>
+        <div id="mount-v1" class="mount">
+          <div class="loading">Loading v1…</div>
+        </div>
       </div>
       <div class="lookup">
         <span class="lookup-label">v2</span>
-        <div id="mount-v2" class="mount"><div class="loading">Loading v2…</div></div>
+        <div id="mount-v2" class="mount">
+          <div class="loading">Loading v2…</div>
+        </div>
       </div>
     </div>
 
@@ -124,8 +129,16 @@
       // LookupV2) so the registry keeps them separate.
       (function () {
         var DEMOS = [
-          { name: "LookupV1", url: "./lookup-table-v1.html", mount: "mount-v1" },
-          { name: "LookupV2", url: "./lookup-table-v2.html", mount: "mount-v2" },
+          {
+            name: "LookupV1",
+            url: "./lookup-table-v1.html",
+            mount: "mount-v1",
+          },
+          {
+            name: "LookupV2",
+            url: "./lookup-table-v2.html",
+            mount: "mount-v2",
+          },
         ];
 
         // Pull the <x-dc> template and <script data-dc-script> body out of a
@@ -144,7 +157,12 @@
         // Wait until support.js has finished loading React and assigned its
         // API onto window (it does this asynchronously after fetching React).
         function whenRuntimeReady(cb) {
-          if (window.__dcUpdate && window.getDC && window.React && window.ReactDOM) {
+          if (
+            window.__dcUpdate &&
+            window.getDC &&
+            window.React &&
+            window.ReactDOM
+          ) {
             return cb();
           }
           setTimeout(function () {
@@ -155,7 +173,8 @@
         function mountDemo(demo) {
           return fetch(demo.url)
             .then(function (r) {
-              if (!r.ok) throw new Error("HTTP " + r.status + " for " + demo.url);
+              if (!r.ok)
+                throw new Error("HTTP " + r.status + " for " + demo.url);
               return r.text();
             })
             .then(function (text) {
