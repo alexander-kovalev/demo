@@ -1,0 +1,812 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          .ss-scroll::-webkit-scrollbar {
+            width: 14px;
+            height: 14px;
+          }
+          .ss-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+          }
+          .ss-scroll::-webkit-scrollbar-thumb {
+            background: #c7ccd1;
+            border: 3px solid #f1f5f9;
+            border-radius: 8px;
+          }
+          .ss-scroll::-webkit-scrollbar-thumb:hover {
+            background: #aeb4ba;
+          }
+        </style>
+      </helmet>
+
+      <div
+        ref="{{ setRoot }}"
+        style="
+          min-height: 100vh;
+          background: #f7f8fa;
+          font-family:
+            Inter,
+            &quot;Segoe UI&quot;,
+            system-ui,
+            -apple-system,
+            sans-serif;
+          color: #1f2937;
+          padding: 64px 48px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        <div style="width: 100%; max-width: 760px">
+          <div
+            style="
+              font-size: 13px;
+              font-weight: 600;
+              color: #64748b;
+              letter-spacing: 0.02em;
+              text-transform: uppercase;
+              margin-bottom: 10px;
+            "
+          >
+            {{ fieldLabel }}
+          </div>
+
+          <!-- FIELD -->
+          <div style="position: relative">
+            <div style="display: flex; align-items: stretch; gap: 8px">
+              <!-- input + toggle group -->
+              <div
+                style="flex:1;display:flex;align-items:stretch;border:1px solid {{ fieldBorder }};border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04);"
+              >
+                <input
+                  type="text"
+                  value="{{ query }}"
+                  onInput="{{ onInput }}"
+                  onFocus="{{ onFocus }}"
+                  placeholder="{{ entityName }}"
+                  style="
+                    flex: 1;
+                    border: none;
+                    outline: none;
+                    font: inherit;
+                    font-size: 15px;
+                    color: #1f2937;
+                    padding: 11px 4px 11px 14px;
+                    background: transparent;
+                  "
+                />
+                <!-- clear (inside input) -->
+                <sc-if
+                  value="{{ hasSelection }}"
+                  hint-placeholder-val="{{ false }}"
+                >
+                  <button
+                    onClick="{{ clearAll }}"
+                    aria-label="Clear selection"
+                    style="
+                      width: 34px;
+                      border: none;
+                      cursor: pointer;
+                      background: transparent;
+                      color: #94a3b8;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      transition: color 0.15s;
+                    "
+                    style-hover="color:#475569;"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                      <path
+                        d="M4 4l8 8M12 4l-8 8"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                </sc-if>
+                <button
+                  onClick="{{ toggleOpen }}"
+                  aria-label="Toggle options"
+                  style="width:42px;border:none;cursor:pointer;background:{{ primary }};display:flex;align-items:center;justify-content:center;transition:background .15s;"
+                  style-hover="filter:brightness(.94);"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    style="transform:rotate({{ caretRotate }});transition:transform .2s;"
+                  >
+                    <path
+                      d="M4 6l4 4 4-4"
+                      stroke="#fff"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- summary line -->
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 8px;
+                font-size: 13px;
+                color: #475569;
+                min-height: 18px;
+                position: relative;
+              "
+            >
+              <sc-if
+                value="{{ hasSelection }}"
+                hint-placeholder-val="{{ false }}"
+              >
+                <button
+                  onClick="{{ toggleTip }}"
+                  aria-label="Show selected"
+                  style="
+                    flex: none;
+                    border: none;
+                    background: transparent;
+                    padding: 0;
+                    margin: 0;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    line-height: 0;
+                  "
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <circle
+                      cx="8"
+                      cy="8"
+                      r="7"
+                      stroke="{{ primary }}"
+                      stroke-width="1.4"
+                    />
+                    <path
+                      d="M8 7v4"
+                      stroke="{{ primary }}"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="8" cy="4.6" r="1" fill="{{ primary }}" />
+                  </svg>
+                </button>
+                <span onClick="{{ toggleTip }}" style="cursor: pointer"
+                  >{{ summaryText }}</span
+                >
+              </sc-if>
+
+              <!-- tooltip -->
+              <sc-if value="{{ tipOpen }}" hint-placeholder-val="{{ false }}">
+                <div
+                  style="
+                    position: absolute;
+                    top: 24px;
+                    left: 0;
+                    z-index: 40;
+                    background: #1e293b;
+                    color: #e2e8f0;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.45);
+                    padding: 6px;
+                    min-width: 240px;
+                    max-width: 340px;
+                  "
+                >
+                  <div
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      letter-spacing: 0.04em;
+                      text-transform: uppercase;
+                      color: #94a3b8;
+                      padding: 6px 10px 4px;
+                    "
+                  >
+                    {{ countLabel }}
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      padding: 4px 10px 6px;
+                      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                      margin-bottom: 2px;
+                    "
+                  >
+                    <span
+                      style="
+                        font-size: 10px;
+                        font-weight: 700;
+                        letter-spacing: 0.04em;
+                        text-transform: uppercase;
+                        color: #64748b;
+                        flex: none;
+                        min-width: 38px;
+                      "
+                      >PSP #</span
+                    >
+                    <span
+                      style="
+                        font-size: 10px;
+                        font-weight: 700;
+                        letter-spacing: 0.04em;
+                        text-transform: uppercase;
+                        color: #64748b;
+                        flex: 1;
+                      "
+                      >Product Description</span
+                    >
+                    <span style="flex: none; width: 15px"></span>
+                  </div>
+                  <div
+                    class="ss-scroll"
+                    style="max-height: 220px; overflow: auto"
+                  >
+                    <sc-for
+                      list="{{ selectedItems }}"
+                      as="it"
+                      hint-placeholder-count="3"
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          gap: 8px;
+                          padding: 6px 10px;
+                          border-radius: 5px;
+                          font-size: 13px;
+                        "
+                        style-hover="background:rgba(255,255,255,.07);"
+                      >
+                        <span
+                          style="
+                            font-size: 11px;
+                            font-weight: 600;
+                            color: #94a3b8;
+                            flex: none;
+                            min-width: 38px;
+                          "
+                          >{{ it.psp }}</span
+                        >
+                        <span style="flex: 1; color: #f1f5f9"
+                          >{{ it.desc }}</span
+                        >
+                        <button
+                          onClick="{{ it.remove }}"
+                          aria-label="Remove"
+                          style="
+                            flex: none;
+                            border: none;
+                            background: transparent;
+                            color: #64748b;
+                            cursor: pointer;
+                            padding: 2px;
+                            line-height: 0;
+                            border-radius: 4px;
+                          "
+                          style-hover="color:#f8fafc;background:rgba(255,255,255,.12);"
+                        >
+                          <svg
+                            width="11"
+                            height="11"
+                            viewBox="0 0 16 16"
+                            fill="none"
+                          >
+                            <path
+                              d="M4 4l8 8M12 4l-8 8"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div
+                    style="
+                      position: absolute;
+                      top: -5px;
+                      left: 5px;
+                      width: 10px;
+                      height: 10px;
+                      background: #1e293b;
+                      transform: rotate(45deg);
+                    "
+                  ></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- PANEL -->
+            <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+              <div
+                style="
+                  position: absolute;
+                  top: 48px;
+                  left: 0;
+                  width: 760px;
+                  max-width: 96vw;
+                  background: #fff;
+                  border: 1px solid #e2e8f0;
+                  border-radius: 8px;
+                  box-shadow:
+                    0 12px 32px -8px rgba(15, 23, 42, 0.22),
+                    0 2px 6px rgba(15, 23, 42, 0.08);
+                  z-index: 30;
+                  overflow: hidden;
+                "
+              >
+                <!-- panel toolbar -->
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 10px 14px;
+                    border-bottom: 1px solid #eef1f4;
+                    background: #fafbfc;
+                  "
+                >
+                  <div
+                    onClick="{{ toggleAll }}"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 9px;
+                      cursor: pointer;
+                      user-select: none;
+                    "
+                  >
+                    <div style="{{ headBoxStyle }}">
+                      <sc-if
+                        value="{{ allChecked }}"
+                        hint-placeholder-val="{{ false }}"
+                        ><svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                        >
+                          <path
+                            d="M3 8.5l3.2 3.2L13 5"
+                            stroke="#fff"
+                            stroke-width="2.2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          /></svg
+                      ></sc-if>
+                      <sc-if
+                        value="{{ someChecked }}"
+                        hint-placeholder-val="{{ false }}"
+                        ><div
+                          style="
+                            width: 9px;
+                            height: 2.5px;
+                            background: #fff;
+                            border-radius: 2px;
+                          "
+                        ></div
+                      ></sc-if>
+                    </div>
+                    <span
+                      style="font-size: 13px; font-weight: 600; color: #334155"
+                      >{{ selectAllLabel }}</span
+                    >
+                  </div>
+                  <span
+                    style="font-size: 12.5px; color: #94a3b8; font-weight: 500"
+                    >{{ countLabel }}</span
+                  >
+                </div>
+
+                <!-- scroll region -->
+                <div
+                  class="ss-scroll"
+                  style="max-height: 340px; overflow: auto"
+                >
+                  <div style="min-width:{{ tableMinWidth }};">
+                    <!-- TABLE HEADER -->
+                    <sc-if
+                      value="{{ showColumns }}"
+                      hint-placeholder-val="{{ true }}"
+                    >
+                      <div
+                        style="display:grid;grid-template-columns:{{ gridCols }};position:sticky;top:0;background:#f1f5f9;border-bottom:1px solid #e2e8f0;z-index:2;"
+                      >
+                        <div style="padding: 11px 8px 11px 14px"></div>
+                        <div
+                          style="
+                            padding: 11px 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #475569;
+                            letter-spacing: 0.01em;
+                          "
+                        >
+                          PSP Internal Number
+                        </div>
+                        <div
+                          style="
+                            padding: 11px 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #475569;
+                            letter-spacing: 0.01em;
+                          "
+                        >
+                          Product Description
+                        </div>
+                        <div
+                          style="
+                            padding: 11px 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #475569;
+                            letter-spacing: 0.01em;
+                          "
+                        >
+                          Manufacturer Product Code
+                        </div>
+                        <div
+                          style="
+                            padding: 11px 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #475569;
+                            letter-spacing: 0.01em;
+                          "
+                        >
+                          Pack Size
+                        </div>
+                        <div
+                          style="
+                            padding: 11px 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #475569;
+                            letter-spacing: 0.01em;
+                          "
+                        >
+                          Category
+                        </div>
+                        <div
+                          style="
+                            padding: 11px 12px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #475569;
+                            letter-spacing: 0.01em;
+                          "
+                        >
+                          Brand
+                        </div>
+                      </div>
+                    </sc-if>
+
+                    <!-- ROWS -->
+                    <sc-for
+                      list="{{ rows }}"
+                      as="row"
+                      hint-placeholder-count="6"
+                    >
+                      <div
+                        onClick="{{ row.toggle }}"
+                        style="{{ row.rowStyle }}"
+                        style-hover="background:#f1f6fe;"
+                      >
+                        <div
+                          style="
+                            padding: 10px 8px 10px 14px;
+                            display: flex;
+                            align-items: center;
+                          "
+                        >
+                          <div style="{{ row.boxStyle }}">
+                            <sc-if
+                              value="{{ row.checked }}"
+                              hint-placeholder-val="{{ false }}"
+                              ><svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                              >
+                                <path
+                                  d="M3 8.5l3.2 3.2L13 5"
+                                  stroke="#fff"
+                                  stroke-width="2.2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                /></svg
+                            ></sc-if>
+                          </div>
+                        </div>
+                        <sc-if
+                          value="{{ showColumns }}"
+                          hint-placeholder-val="{{ true }}"
+                        >
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 13.5px;
+                              color: #475569;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.psp }}
+                          </div>
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 13.5px;
+                              color: #1f2937;
+                              font-weight: 500;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.desc }}
+                          </div>
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 13.5px;
+                              color: #475569;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.code }}
+                          </div>
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 13.5px;
+                              color: #475569;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.pack }}
+                          </div>
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 13.5px;
+                              color: #94a3b8;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.cat }}
+                          </div>
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 13.5px;
+                              color: #475569;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.brand }}
+                          </div>
+                        </sc-if>
+                        <sc-if
+                          value="{{ row.simple }}"
+                          hint-placeholder-val="{{ false }}"
+                        >
+                          <div
+                            style="
+                              padding: 10px 12px;
+                              font-size: 14px;
+                              color: #1f2937;
+                              display: flex;
+                              align-items: center;
+                            "
+                          >
+                            {{ row.desc }}
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+
+                    <sc-if
+                      value="{{ noResults }}"
+                      hint-placeholder-val="{{ false }}"
+                    >
+                      <div
+                        style="
+                          padding: 32px;
+                          text-align: center;
+                          color: #94a3b8;
+                          font-size: 14px;
+                        "
+                      >
+                        No results found
+                      </div>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+    <script
+      type="text/x-dc"
+      data-dc-script
+      data-props='{"$preview":{"width":900,"height":560},"primary":{"editor":"color","default":"#2563eb","tsType":"string","options":["#2563eb","#1d4ed8","#0ea5e9","#7c3aed","#0f766e","#dc2626"]},"showColumns":{"editor":"boolean","default":true,"tsType":"boolean"},"entityName":{"editor":"text","default":"Products","tsType":"string"},"fieldLabel":{"editor":"text","default":"Product Catalog","tsType":"string"}}'
+    >
+      class Component extends DCLogic {
+        constructor(props) {
+          super(props);
+          this.data = [
+            { id: 1, psp: 2689, desc: 'WINE COOKING SHERRY', code: 520460, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+            { id: 2, psp: 2690, desc: 'WINE COOKING BURGUNDY', code: 520461, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+            { id: 3, psp: 2692, desc: 'VINEGAR WINE RED', code: 520420, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+            { id: 4, psp: 7715, desc: 'VINEGAR WHITE WINE', code: 520421, pack: '4/1 GAL', cat: null, brand: 'REGINA' },
+            { id: 5, psp: 2638, desc: 'GYRO SLICES RAW IQF', code: 20065, pack: '1/10 LB', cat: null, brand: 'GRECIAN D' },
+            { id: 6, psp: 2641, desc: 'GYRO CONE BEEF & LAMB', code: 20071, pack: '2/20 LB', cat: 'MEAT', brand: 'GRECIAN D' },
+            { id: 7, psp: 3102, desc: 'OLIVE OIL EXTRA VIRGIN', code: 118840, pack: '4/1 GAL', cat: 'OIL', brand: 'COLAVITA' },
+            { id: 8, psp: 3110, desc: 'OLIVE OIL POMACE BLEND', code: 118855, pack: '6/1 GAL', cat: 'OIL', brand: 'COLAVITA' },
+            { id: 9, psp: 4051, desc: 'FETA CHEESE CRUMBLES', code: 60412, pack: '4/5 LB', cat: 'DAIRY', brand: 'PRESIDENT' },
+            { id: 10, psp: 4072, desc: 'MOZZARELLA SHRED LMPS', code: 60498, pack: '4/5 LB', cat: 'DAIRY', brand: 'GALBANI' },
+            { id: 11, psp: 5203, desc: 'TOMATO PASTE 6/10', code: 88102, pack: '6/#10', cat: 'CANNED', brand: 'STANISLAUS' },
+            { id: 12, psp: 5219, desc: 'TOMATO CRUSHED GROUND', code: 88140, pack: '6/#10', cat: 'CANNED', brand: 'STANISLAUS' },
+            { id: 13, psp: 6610, desc: 'PITA BREAD 7 INCH', code: 41020, pack: '12/6 CT', cat: 'BAKERY', brand: 'KONTOS' },
+            { id: 14, psp: 6622, desc: 'PITA BREAD POCKETLESS', code: 41044, pack: '12/10 CT', cat: 'BAKERY', brand: 'KONTOS' },
+            { id: 15, psp: 7001, desc: 'CHICKEN BREAST BNLS SKLS', code: 30210, pack: '1/40 LB', cat: 'POULTRY', brand: 'TYSON' },
+            { id: 16, psp: 7044, desc: 'CHICKEN TENDERS BREADED', code: 30288, pack: '2/5 LB', cat: 'POULTRY', brand: 'TYSON' },
+            { id: 17, psp: 8120, desc: 'RICE BASMATI LONG GRAIN', code: 71200, pack: '1/25 LB', cat: 'GRAIN', brand: 'ROYAL' },
+            { id: 18, psp: 8134, desc: 'RICE JASMINE PREMIUM', code: 71244, pack: '1/25 LB', cat: 'GRAIN', brand: 'DYNASTY' },
+            { id: 19, psp: 9201, desc: 'GARLIC MINCED IN OIL', code: 99340, pack: '2/5 LB', cat: 'PRODUCE', brand: 'SPICE WLD' },
+            { id: 20, psp: 9255, desc: 'ONION POWDER GRANULATED', code: 99388, pack: '6/20 OZ', cat: 'SPICE', brand: 'SPICE WLD' },
+            { id: 21, psp: 1042, desc: 'SUGAR GRANULATED FINE', code: 12010, pack: '1/50 LB', cat: 'BAKING', brand: 'DOMINO' },
+            { id: 22, psp: 1058, desc: 'FLOUR ALL PURPOSE BLCHD', code: 12080, pack: '1/50 LB', cat: 'BAKING', brand: 'GOLD MDL' },
+            { id: 23, psp: 1190, desc: 'SALT KOSHER COARSE', code: 12190, pack: '12/3 LB', cat: 'SPICE', brand: 'DIAMOND' },
+            { id: 24, psp: 1224, desc: 'PEPPER BLACK GROUND', code: 12244, pack: '6/18 OZ', cat: 'SPICE', brand: 'MCCORMICK' },
+            { id: 25, psp: 1330, desc: 'BUTTER SOLIDS UNSALTED', code: 60710, pack: '1/36 LB', cat: 'DAIRY', brand: 'LAND O LK' },
+            { id: 26, psp: 1402, desc: 'EGGS WHOLE LIQUID', code: 60822, pack: '15/2 LB', cat: 'DAIRY', brand: 'PAPETTI' }
+          ];
+          this.state = { open: false, tipOpen: false, query: '', selected: new Set([1, 2, 3, 5, 7, 9]) };
+          this._onDocDown = this._onDocDown.bind(this);
+        }
+
+        componentDidMount() { document.addEventListener('mousedown', this._onDocDown); }
+        componentWillUnmount() { document.removeEventListener('mousedown', this._onDocDown); }
+        _onDocDown(e) { if (this.root && !this.root.contains(e.target)) this.setState({ open: false, tipOpen: false }); }
+
+        toggle(id) {
+          this.setState(s => {
+            const sel = new Set(s.selected);
+            sel.has(id) ? sel.delete(id) : sel.add(id);
+            return { selected: sel };
+          });
+        }
+
+        filtered() {
+          const q = this.state.query.trim().toLowerCase();
+          if (!q) return this.data;
+          return this.data.filter(o =>
+            ['psp', 'desc', 'code', 'pack', 'cat', 'brand'].some(k => String(o[k] ?? '').toLowerCase().includes(q))
+          );
+        }
+
+        renderVals() {
+          const primary = this.props.primary || '#2563eb';
+          const showColumns = this.props.showColumns ?? true;
+          const entityName = this.props.entityName || 'Products';
+          const { open, query, selected, tipOpen } = this.state;
+          const list = this.filtered();
+
+          const box = (checked, partial) =>
+            `width:20px;height:20px;border-radius:5px;flex:none;display:flex;align-items:center;justify-content:center;transition:all .12s;` +
+            (checked || partial
+              ? `background:${primary};border:1px solid ${primary};`
+              : `background:#fff;border:1.5px solid #cbd5e1;`);
+
+          const rows = list.map(o => {
+            const checked = selected.has(o.id);
+            return {
+              ...o,
+              cat: o.cat === null ? 'null' : o.cat,
+              checked,
+              simple: !showColumns,
+              toggle: () => this.toggle(o.id),
+              boxStyle: box(checked, false),
+              rowStyle: `display:grid;grid-template-columns:${showColumns ? '44px 160px 230px 200px 110px 120px 130px' : '44px 1fr'};cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background .1s;background:${checked ? '#eff6fe' : '#fff'};`
+            };
+          });
+
+          const count = selected.size;
+          const allChecked = list.length > 0 && list.every(o => selected.has(o.id));
+          const someChecked = !allChecked && list.some(o => selected.has(o.id));
+
+          let summaryText = '';
+          if (count === 1) {
+            const only = this.data.find(o => selected.has(o.id));
+            summaryText = only ? only.desc : '';
+          } else if (count > 1) {
+            summaryText = `Multiple ${entityName} are selected`;
+          }
+
+          return {
+            primary,
+            showColumns,
+            entityName,
+            fieldLabel: this.props.fieldLabel || 'Product Catalog',
+            fieldBorder: open ? primary : '#cbd5e1',
+            query,
+            open,
+            caretRotate: open ? '180deg' : '0deg',
+            hasSelection: count > 0,
+            summaryText,
+            tipOpen: tipOpen && count > 0,
+            toggleTip: (e) => { e.stopPropagation(); this.setState(s => ({ tipOpen: !s.tipOpen })); },
+            selectedItems: this.data.filter(o => selected.has(o.id)).map(o => ({
+              psp: o.psp, desc: o.desc, remove: (e) => { e.stopPropagation(); this.toggle(o.id); }
+            })),
+            rows,
+            noResults: list.length === 0,
+            allChecked,
+            someChecked,
+            headBoxStyle: box(allChecked, someChecked),
+            selectAllLabel: allChecked ? 'Deselect all' : 'Select all',
+            countLabel: `${count} selected`,
+            tableMinWidth: showColumns ? '1094px' : '100%',
+            gridCols: '44px 160px 230px 200px 110px 120px 130px',
+            onFocus: () => this.setState({ open: true }),
+            toggleOpen: (e) => { e.preventDefault(); this.setState(s => ({ open: !s.open })); },
+            onInput: (e) => this.setState({ query: e.target.value, open: true }),
+            clearAll: (e) => { e.stopPropagation(); this.setState({ selected: new Set(), query: '' }); },
+            setRoot: (el) => { this.root = el; },
+            toggleAll: () => {
+              this.setState(s => {
+                const sel = new Set(s.selected);
+                const cur = this.filtered();
+                const all = cur.length > 0 && cur.every(o => sel.has(o.id));
+                cur.forEach(o => all ? sel.delete(o.id) : sel.add(o.id));
+                return { selected: sel };
+              });
+            }
+          };
+        }
+      }
+    </script>
+  </body>
+</html>
