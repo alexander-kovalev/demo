@@ -39,6 +39,7 @@
       </helmet>
 
       <div
+        id="ss-root"
         ref="{{ setRoot }}"
         style="
           min-height: 100vh;
@@ -74,143 +75,156 @@
           <!-- FIELD -->
           <div style="position: relative">
             <div style="display: flex; align-items: stretch; gap: 8px">
-              <!-- input + toggle group -->
+              <!-- input + toggle group (with left selected-info addon) -->
               <div
                 style="flex:1;display:flex;align-items:stretch;border:1px solid {{ fieldBorder }};border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04);"
               >
-                <input
-                  type="text"
-                  value="{{ query }}"
-                  onInput="{{ onInput }}"
-                  onFocus="{{ onFocus }}"
-                  placeholder="{{ entityName }}"
-                  style="
-                    flex: 1;
-                    border: none;
-                    outline: none;
-                    font: inherit;
-                    font-size: 15px;
-                    color: #1f2937;
-                    padding: 11px 4px 11px 14px;
-                    background: transparent;
-                  "
-                />
-                <!-- clear (inside input) -->
+                <!-- left addon (selected-options info + clear) -->
                 <sc-if
                   value="{{ hasSelection }}"
                   hint-placeholder-val="{{ false }}"
                 >
-                  <button
-                    onClick="{{ clearAll }}"
-                    aria-label="Clear selection"
+                  <div
                     style="
-                      width: 34px;
-                      border: none;
-                      cursor: pointer;
-                      background: transparent;
-                      color: #94a3b8;
                       display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      transition: color 0.15s;
+                      align-items: stretch;
+                      background: #f8fafc;
+                      border-right: 1px solid #e2e8f0;
                     "
-                    style-hover="color:#475569;"
                   >
-                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                    <button
+                      onClick="{{ toggleTip }}"
+                      aria-label="Show selected"
+                      title="Show selected items"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 7px;
+                        padding: 0 11px 0 13px;
+                        background: transparent;
+                        border: none;
+                        font: inherit;
+                        font-size: 13px;
+                        font-weight: 500;
+                        color: #475569;
+                        letter-spacing: 0.01em;
+                        white-space: nowrap;
+                        cursor: pointer;
+                        transition: background 0.15s;
+                      "
+                      style-hover="background:#eef2f7;"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        style="flex: none"
+                      >
+                        <rect
+                          x="1.5"
+                          y="1.5"
+                          width="13"
+                          height="13"
+                          rx="3"
+                          fill="{{ primary }}"
+                        />
+                        <path
+                          d="M4.5 8.2l2.2 2.2L11.5 5.6"
+                          stroke="#fff"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <span>{{ summaryText }}</span>
+                    </button>
+                    <button
+                      onClick="{{ clearAll }}"
+                      aria-label="Clear selection"
+                      title="Clear all selected"
+                      style="
+                        width: 30px;
+                        border: none;
+                        cursor: pointer;
+                        background: transparent;
+                        color: #94a3b8;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: color 0.15s;
+                      "
+                      style-hover="color:#475569;"
+                    >
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                      >
+                        <path
+                          d="M4 4l8 8M12 4l-8 8"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </sc-if>
+                <div style="flex: 1; display: flex; align-items: stretch">
+                  <input
+                    type="text"
+                    value="{{ query }}"
+                    onInput="{{ onInput }}"
+                    onFocus="{{ onFocus }}"
+                    placeholder="{{ entityName }}"
+                    title="Type to search options"
+                    style="
+                      flex: 1;
+                      border: none;
+                      outline: none;
+                      font: inherit;
+                      font-size: 15px;
+                      color: #1f2937;
+                      padding: 11px 14px;
+                      background: transparent;
+                    "
+                  />
+                  <button
+                    onClick="{{ toggleOpen }}"
+                    aria-label="Toggle options"
+                    title="Show options"
+                    style="width:42px;border:none;cursor:pointer;background:{{ primary }};display:flex;align-items:center;justify-content:center;transition:background .15s;"
+                    style-hover="filter:brightness(.94);"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      style="transform:rotate({{ caretRotate }});transition:transform .2s;"
+                    >
                       <path
-                        d="M4 4l8 8M12 4l-8 8"
-                        stroke="currentColor"
+                        d="M4 6l4 4 4-4"
+                        stroke="#fff"
                         stroke-width="2"
                         stroke-linecap="round"
+                        stroke-linejoin="round"
                       />
                     </svg>
                   </button>
-                </sc-if>
-                <button
-                  onClick="{{ toggleOpen }}"
-                  aria-label="Toggle options"
-                  style="width:42px;border:none;cursor:pointer;background:{{ primary }};display:flex;align-items:center;justify-content:center;transition:background .15s;"
-                  style-hover="filter:brightness(.94);"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    style="transform:rotate({{ caretRotate }});transition:transform .2s;"
-                  >
-                    <path
-                      d="M4 6l4 4 4-4"
-                      stroke="#fff"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </button>
+                </div>
               </div>
             </div>
 
-            <!-- summary line -->
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                gap: 7px;
-                margin-top: 8px;
-                font-size: 13px;
-                color: #475569;
-                min-height: 18px;
-                position: relative;
-              "
-            >
-              <sc-if
-                value="{{ hasSelection }}"
-                hint-placeholder-val="{{ false }}"
-              >
-                <button
-                  onClick="{{ toggleTip }}"
-                  aria-label="Show selected"
-                  style="
-                    flex: none;
-                    border: none;
-                    background: transparent;
-                    padding: 0;
-                    margin: 0;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    line-height: 0;
-                  "
-                >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                    <circle
-                      cx="8"
-                      cy="8"
-                      r="7"
-                      stroke="{{ primary }}"
-                      stroke-width="1.4"
-                    />
-                    <path
-                      d="M8 7v4"
-                      stroke="{{ primary }}"
-                      stroke-width="1.6"
-                      stroke-linecap="round"
-                    />
-                    <circle cx="8" cy="4.6" r="1" fill="{{ primary }}" />
-                  </svg>
-                </button>
-                <span onClick="{{ toggleTip }}" style="cursor: pointer"
-                  >{{ summaryText }}</span
-                >
-              </sc-if>
-
-              <!-- tooltip -->
+            <!-- selected-options tooltip (anchored under addon) -->
+            <div style="position: relative">
               <sc-if value="{{ tipOpen }}" hint-placeholder-val="{{ false }}">
                 <div
                   style="
                     position: absolute;
-                    top: 24px;
+                    top: 8px;
                     left: 0;
                     z-index: 40;
                     background: #1e293b;
@@ -305,6 +319,7 @@
                         <button
                           onClick="{{ it.remove }}"
                           aria-label="Remove"
+                          title="Remove from selection"
                           style="
                             flex: none;
                             border: none;
@@ -381,6 +396,7 @@
                 >
                   <div
                     onClick="{{ toggleAll }}"
+                    title="{{ selectAllLabel }}"
                     style="
                       display: flex;
                       align-items: center;
@@ -523,6 +539,7 @@
                     >
                       <div
                         onClick="{{ row.toggle }}"
+                        title="{{ row.title }}"
                         style="{{ row.rowStyle }}"
                         style-hover="background:#f1f6fe;"
                       >
@@ -747,6 +764,7 @@
               cat: o.cat === null ? 'null' : o.cat,
               checked,
               simple: !showColumns,
+              title: checked ? 'Click to deselect' : 'Click to select',
               toggle: () => this.toggle(o.id),
               boxStyle: box(checked, false),
               rowStyle: `display:grid;grid-template-columns:${showColumns ? '44px 160px 230px 200px 110px 120px 130px' : '44px 1fr'};cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background .1s;background:${checked ? '#eff6fe' : '#fff'};`
@@ -762,7 +780,7 @@
             const only = this.data.find(o => selected.has(o.id));
             summaryText = only ? only.desc : '';
           } else if (count > 1) {
-            summaryText = `Multiple ${entityName} are selected`;
+            summaryText = `${count} ${entityName}`;
           }
 
           return {
