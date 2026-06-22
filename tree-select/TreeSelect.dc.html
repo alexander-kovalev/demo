@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  .ss-scroll::-webkit-scrollbar { width: 12px; height: 12px; }
+  .ss-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+  .ss-scroll::-webkit-scrollbar-thumb { background: #c7ccd1; border: 3px solid #f1f5f9; border-radius: 8px; }
+  .ss-scroll::-webkit-scrollbar-thumb:hover { background: #aeb4ba; }
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="width:100%;font-family:Inter,'Segoe UI',system-ui,-apple-system,sans-serif;color:#1f2937;">
+
+  <div style="font-size:12px;font-weight:600;color:#64748b;letter-spacing:.02em;text-transform:uppercase;margin-bottom:8px;">{{ fieldLabel }}</div>
+
+  <!-- FIELD -->
+  <div style="position:relative;">
+    <div style="display:flex;align-items:stretch;border:1px solid {{ fieldBorder }};border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04);">
+      <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ toggleTip }}" title="Show selected" style="flex:none;max-width:260px;display:flex;align-items:center;gap:6px;padding:0 11px;background:#f4f6f9;border-right:1px solid #e2e8f0;cursor:pointer;user-select:none;" style-hover="background:#eef1f5;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex:none;"><rect x="2" y="2" width="12" height="12" rx="3" fill="{{ primary }}"/><path d="M4.8 8.2l2.1 2.1L11.4 5.8" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:12.5px;font-weight:500;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ summaryText }}</span>
+          <button onClick="{{ clearAll }}" aria-label="Clear selection" style="flex:none;margin-left:2px;width:22px;height:22px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:#94a3b8;display:flex;align-items:center;justify-content:center;" style-hover="color:#475569;background:rgba(15,23,42,.06);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </sc-if>
+      <input
+        type="text"
+        value="{{ query }}"
+        onInput="{{ onInput }}"
+        onFocus="{{ onFocus }}"
+        placeholder="Search {{ entityName }}"
+        style="flex:1;min-width:0;border:none;outline:none;font:inherit;font-size:14px;color:#1f2937;padding:10px 4px 10px 13px;background:transparent;" />
+      <button onClick="{{ toggleOpen }}" aria-label="Toggle options" style="width:40px;border:none;cursor:pointer;background:{{ primary }};display:flex;align-items:center;justify-content:center;" style-hover="filter:brightness(.94);">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="transform:rotate({{ caretRotate }});transition:transform .2s;"><path d="M4 6l4 4 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- tooltip -->
+    <div style="position:relative;">
+      <sc-if value="{{ tipOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:6px;left:0;z-index:40;background:#1e293b;color:#e2e8f0;border-radius:8px;box-shadow:0 10px 28px -6px rgba(15,23,42,.45);padding:6px;min-width:250px;max-width:360px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#94a3b8;padding:6px 10px 6px;">{{ countLabel }}</div>
+          <div class="ss-scroll" style="max-height:220px;overflow:auto;">
+            <sc-for list="{{ selectedItems }}" as="it" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:5px;font-size:13px;" style-hover="background:rgba(255,255,255,.07);">
+                <span style="flex:none;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#cbd5e1;background:rgba(255,255,255,.09);border-radius:4px;padding:2px 0;width:92px;text-align:center;box-sizing:border-box;">{{ it.level }}</span>
+                <span style="font-size:11px;font-weight:600;color:#94a3b8;flex:none;min-width:78px;">{{ it.code }}</span>
+                <span style="flex:1;color:#f1f5f9;">{{ it.desc }}</span>
+                <button onClick="{{ it.remove }}" aria-label="Remove" style="flex:none;border:none;background:transparent;color:#64748b;cursor:pointer;padding:2px;line-height:0;border-radius:4px;" style-hover="color:#f8fafc;background:rgba(255,255,255,.12);">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position:absolute;top:-5px;left:5px;width:10px;height:10px;background:#1e293b;transform:rotate(45deg);"></div>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- PANEL -->
+    <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ panelStyle }}">
+
+      <!-- toolbar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #eef1f4;background:#fafbfc;">
+        <sc-if value="{{ showGlobalSelectAll }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ selectAllVisible }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;">
+            <div style="{{ allBoxStyle }}">
+              <sc-if value="{{ allChecked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+              <sc-if value="{{ someChecked }}" hint-placeholder-val="{{ false }}"><div style="width:9px;height:2.5px;background:#fff;border-radius:2px;"></div></sc-if>
+            </div>
+            <span style="font-size:13px;font-weight:600;color:#334155;">{{ selectAllLabel }}</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isColumns }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12.5px;color:#475569;font-weight:500;">{{ crumbText }}</div>
+        </sc-if>
+        <span style="font-size:12px;color:#94a3b8;font-weight:600;">{{ countLabel }}</span>
+      </div>
+
+      <!-- ================= TREE ================= -->
+      <sc-if value="{{ isTree }}" hint-placeholder-val="{{ false }}">
+        <div class="ss-scroll" style="max-height:360px;overflow:auto;">
+          <div style="min-width:760px;">
+            <div style="display:grid;grid-template-columns:minmax(200px,1.3fr) 110px 140px 120px 120px;position:sticky;top:0;background:#f1f5f9;border-bottom:1px solid #e2e8f0;z-index:2;">
+              <div style="padding:10px 14px;font-size:11.5px;font-weight:700;color:#475569;letter-spacing:.02em;text-transform:uppercase;">Establishment / Group</div>
+              <div style="padding:10px 12px;font-size:11.5px;font-weight:700;color:#475569;letter-spacing:.02em;text-transform:uppercase;">Code</div>
+              <div style="padding:10px 12px;font-size:11.5px;font-weight:700;color:#475569;letter-spacing:.02em;text-transform:uppercase;">Region</div>
+              <div style="padding:10px 12px;font-size:11.5px;font-weight:700;color:#475569;letter-spacing:.02em;text-transform:uppercase;">Type</div>
+              <div style="padding:10px 12px;font-size:11.5px;font-weight:700;color:#475569;letter-spacing:.02em;text-transform:uppercase;">Status</div>
+            </div>
+            <sc-for list="{{ treeRows }}" as="row" hint-placeholder-count="7">
+              <div style="{{ row.rowStyle }}" style-hover="background:#f5f8fd;">
+                <div style="{{ row.firstCellStyle }}">
+                  <sc-if value="{{ row.hasChildren }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ row.toggleExpand }}" aria-label="Expand" style="width:18px;height:18px;flex:none;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#94a3b8;padding:0;">
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="transform:rotate({{ row.chevronRotate }});transition:transform .15s;"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ row.isLeaf }}" hint-placeholder-val="{{ false }}"><span style="width:18px;flex:none;"></span></sc-if>
+                  <div onClick="{{ row.toggleCheck }}" style="{{ row.boxStyle }}cursor:pointer;">
+                    <sc-if value="{{ row.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                  <span onClick="{{ row.toggleCheck }}" style="{{ row.nameStyle }}">{{ row.name }}</span>
+                  <sc-if value="{{ row.showSelAll }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ row.selAll }}" title="Select every establishment in this group" style="{{ row.selAllStyle }}">{{ row.selAllText }}</button>
+                  </sc-if>
+                </div>
+                <div style="padding:9px 12px;font-size:12.5px;color:#475569;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ row.code }}</div>
+                <div style="padding:9px 12px;font-size:12.5px;color:#475569;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ row.region }}</div>
+                <div style="padding:9px 12px;font-size:12px;color:#94a3b8;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ row.typeLabel }}</div>
+                <div style="padding:9px 12px;font-size:12.5px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:{{ row.statusColor }};font-weight:500;">{{ row.statusText }}</span></div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:14px;">No matches found</div></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= ACCORDION ================= -->
+      <sc-if value="{{ isAccordion }}" hint-placeholder-val="{{ false }}">
+        <div class="ss-scroll" style="max-height:360px;overflow:auto;">
+          <div style="min-width:680px;">
+            <sc-for list="{{ accRows }}" as="row" hint-placeholder-count="7">
+              <sc-if value="{{ row.isGrp }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ row.headerStyle }}">
+                  <button onClick="{{ row.toggleExpand }}" aria-label="Expand" style="width:18px;height:18px;flex:none;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b;padding:0;">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="transform:rotate({{ row.chevronRotate }});transition:transform .15s;"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div onClick="{{ row.toggleCheck }}" style="{{ row.boxStyle }}cursor:pointer;">
+                    <sc-if value="{{ row.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                  <span style="font-size:13.5px;font-weight:700;color:#0f172a;">{{ row.name }}</span>
+                  <span style="font-size:11.5px;color:#64748b;font-weight:500;">{{ row.code }} · {{ row.region }}</span>
+                  <span style="flex:1;"></span>
+                  <span style="font-size:11.5px;color:#94a3b8;font-weight:500;">{{ row.count }}</span>
+                  <button onClick="{{ row.selAll }}" style="{{ row.selAllStyle }}">{{ row.selAllText }}</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ row.isSub }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ row.headerStyle }}">
+                  <button onClick="{{ row.toggleExpand }}" aria-label="Expand" style="width:18px;height:18px;flex:none;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#94a3b8;padding:0;">
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="transform:rotate({{ row.chevronRotate }});transition:transform .15s;"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div onClick="{{ row.toggleCheck }}" style="{{ row.boxStyle }}cursor:pointer;">
+                    <sc-if value="{{ row.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                  <span style="font-size:13px;font-weight:600;color:#334155;">{{ row.name }}</span>
+                  <span style="flex:1;"></span>
+                  <span style="font-size:11px;color:#94a3b8;font-weight:500;">{{ row.count }}</span>
+                  <button onClick="{{ row.selAll }}" style="{{ row.selAllStyle }}">{{ row.selAllText }}</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ row.isLeaf }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ row.rowStyle }}" style-hover="background:#f5f8fd;">
+                  <div style="{{ row.firstCellStyle }}">
+                    <div onClick="{{ row.toggleCheck }}" style="{{ row.boxStyle }}cursor:pointer;">
+                      <sc-if value="{{ row.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                    </div>
+                    <span onClick="{{ row.toggleCheck }}" style="{{ row.nameStyle }}">{{ row.name }}</span>
+                  </div>
+                  <div style="padding:9px 12px;font-size:12.5px;color:#475569;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ row.code }}</div>
+                  <div style="padding:9px 12px;font-size:12.5px;color:#475569;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ row.region }}</div>
+                  <div style="padding:9px 12px;font-size:12px;color:#94a3b8;display:flex;align-items:center;">Establishment</div>
+                  <div style="padding:9px 12px;font-size:12.5px;display:flex;align-items:center;"><span style="color:{{ row.statusColor }};font-weight:500;">{{ row.statusText }}</span></div>
+                </div>
+              </sc-if>
+            </sc-for>
+            <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div style="padding:30px;text-align:center;color:#94a3b8;font-size:14px;">No matches found</div></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ================= COLUMNS (Miller) ================= -->
+      <sc-if value="{{ isColumns }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;height:330px;">
+          <!-- pane 1 -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid #eef1f4;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#f8fafc;border-bottom:1px solid #eef1f4;">
+              <span style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">Grouping</span>
+              <button onClick="{{ selPane1 }}" style="font-size:10.5px;font-weight:600;color:{{ primary }};background:transparent;border:none;cursor:pointer;padding:0;">{{ pane1Lab }}</button>
+            </div>
+            <div class="ss-scroll" style="flex:1;overflow:auto;">
+              <sc-for list="{{ pane1 }}" as="it" hint-placeholder-count="3">
+                <div onClick="{{ it.go }}" style="{{ it.itemStyle }}" style-hover="background:#f5f8fd;">
+                  <div onClick="{{ it.toggleCheck }}" style="{{ it.boxStyle }}cursor:pointer;">
+                    <sc-if value="{{ it.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="{{ it.nameStyle }}">{{ it.name }}</div>
+                    <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.meta }}</div>
+                  </div>
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="flex:none;color:#cbd5e1;"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <!-- pane 2 -->
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid #eef1f4;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#f8fafc;border-bottom:1px solid #eef1f4;">
+              <span style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">SubGroup</span>
+              <button onClick="{{ selPane2 }}" style="font-size:10.5px;font-weight:600;color:{{ primary }};background:transparent;border:none;cursor:pointer;padding:0;">{{ pane2Lab }}</button>
+            </div>
+            <div class="ss-scroll" style="flex:1;overflow:auto;">
+              <sc-for list="{{ pane2 }}" as="it" hint-placeholder-count="2">
+                <div onClick="{{ it.go }}" style="{{ it.itemStyle }}" style-hover="background:#f5f8fd;">
+                  <div onClick="{{ it.toggleCheck }}" style="{{ it.boxStyle }}cursor:pointer;">
+                    <sc-if value="{{ it.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="{{ it.nameStyle }}">{{ it.name }}</div>
+                    <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.meta }}</div>
+                  </div>
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="flex:none;color:#cbd5e1;"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <!-- pane 3 -->
+          <div style="flex:1.1;min-width:0;display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 11px;background:#f8fafc;border-bottom:1px solid #eef1f4;">
+              <span style="font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">Establishment</span>
+              <button onClick="{{ selPane3 }}" style="font-size:10.5px;font-weight:600;color:{{ primary }};background:transparent;border:none;cursor:pointer;padding:0;">{{ pane3Lab }}</button>
+            </div>
+            <div class="ss-scroll" style="flex:1;overflow:auto;">
+              <sc-for list="{{ pane3 }}" as="it" hint-placeholder-count="4">
+                <div onClick="{{ it.toggle }}" style="{{ it.itemStyle }}" style-hover="background:#f5f8fd;">
+                  <div onClick="{{ it.toggleCheck }}" style="{{ it.boxStyle }}margin-top:1px;cursor:pointer;">
+                    <sc-if value="{{ it.checked }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:13px;font-weight:500;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.name }}</div>
+                    <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.meta }} · <span style="color:{{ it.statusColor }};font-weight:600;">{{ it.status }}</span></div>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ pane3Empty }}" hint-placeholder-val="{{ false }}"><div style="padding:24px;text-align:center;color:#cbd5e1;font-size:13px;">No establishments</div></sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:700,&quot;height&quot;:560},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;tree&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;tree&quot;,&quot;accordion&quot;,&quot;columns&quot;]},&quot;primary&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2563eb&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#2563eb&quot;,&quot;#1d4ed8&quot;,&quot;#0ea5e9&quot;,&quot;#7c3aed&quot;,&quot;#0f766e&quot;,&quot;#dc2626&quot;]},&quot;entityName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Establishments&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;fieldLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Establishment Hierarchy&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;inline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.tree = [
+      { id:'g1', type:'Grouping', code:'GRP-01', name:'Northern Division', region:'North', children:[
+        { id:'s11', type:'SubGroup', code:'SG-101', name:'Metro North Cluster', region:'North · Metro', children:[
+          { id:'e1', type:'Establishment', code:'ESTAB_00449', name:'Riverside Market', region:'Brockton', status:'Active' },
+          { id:'e2', type:'Establishment', code:'ESTAB_01574', name:'Posada Grill', region:'Quincy', status:'Active' },
+          { id:'e3', type:'Establishment', code:'ESTAB_02090', name:'Hyland Café', region:'Lynn', status:'Pending' },
+          { id:'e4', type:'Establishment', code:'ESTAB_02103', name:'Library Tavern', region:'Salem', status:'Active' }
+        ]},
+        { id:'s12', type:'SubGroup', code:'SG-102', name:'Coastal North Cluster', region:'North · Coast', children:[
+          { id:'e5', type:'Establishment', code:'ESTAB_02577', name:'Parkside Deli', region:'Gloucester', status:'Active' },
+          { id:'e6', type:'Establishment', code:'ESTAB_02579', name:'Parsons Bakery', region:'Newburyport', status:'Closed' },
+          { id:'e7', type:'Establishment', code:'ESTAB_02580', name:'Oldport Kitchen', region:'Beverly', status:'Active' },
+          { id:'e8', type:'Establishment', code:'ESTAB_02581', name:'Olde Wharf Co', region:'Marblehead', status:'Pending' }
+        ]}
+      ]},
+      { id:'g2', type:'Grouping', code:'GRP-02', name:'Central Division', region:'Central', children:[
+        { id:'s21', type:'SubGroup', code:'SG-201', name:'Capital Cluster', region:'Central · Capital', children:[
+          { id:'e9',  type:'Establishment', code:'ESTAB_02595', name:'Jimeno Bistro', region:'Worcester', status:'Active' },
+          { id:'e10', type:'Establishment', code:'ESTAB_02611', name:'Acorn Pantry', region:'Framingham', status:'Active' },
+          { id:'e11', type:'Establishment', code:'ESTAB_02650', name:'Foxglen Diner', region:'Natick', status:'Pending' },
+          { id:'e12', type:'Establishment', code:'ESTAB_02651', name:'Charter House', region:'Marlborough', status:'Active' }
+        ]},
+        { id:'s22', type:'SubGroup', code:'SG-202', name:'Inland Cluster', region:'Central · Inland', children:[
+          { id:'e13', type:'Establishment', code:'ESTAB_02652', name:'Douglas Roastery', region:'Auburn', status:'Active' },
+          { id:'e14', type:'Establishment', code:'ESTAB_02690', name:'Maple & Vine', region:'Leominster', status:'Closed' },
+          { id:'e15', type:'Establishment', code:'ESTAB_02701', name:'Granary Hall', region:'Fitchburg', status:'Active' },
+          { id:'e16', type:'Establishment', code:'ESTAB_02742', name:'Birchwood Stop', region:'Gardner', status:'Pending' }
+        ]}
+      ]},
+      { id:'g3', type:'Grouping', code:'GRP-03', name:'Southern Division', region:'South', children:[
+        { id:'s31', type:'SubGroup', code:'SG-301', name:'Gulf Cluster', region:'South · Gulf', children:[
+          { id:'e17', type:'Establishment', code:'ESTAB_02810', name:'Seabreeze Shack', region:'Fall River', status:'Active' },
+          { id:'e18', type:'Establishment', code:'ESTAB_02844', name:'Harborlight Co', region:'New Bedford', status:'Active' },
+          { id:'e19', type:'Establishment', code:'ESTAB_02877', name:'Cobalt Cantina', region:'Taunton', status:'Pending' }
+        ]},
+        { id:'s32', type:'SubGroup', code:'SG-302', name:'Border Cluster', region:'South · Border', children:[
+          { id:'e20', type:'Establishment', code:'ESTAB_02901', name:'Junction Pantry', region:'Attleboro', status:'Active' },
+          { id:'e21', type:'Establishment', code:'ESTAB_02922', name:'Ridgeway Grill', region:'Mansfield', status:'Closed' },
+          { id:'e22', type:'Establishment', code:'ESTAB_02944', name:'Sterling Larder', region:'Foxborough', status:'Active' }
+        ]}
+      ]}
+    ];
+    this.byId = {}; this.allNodes = [];
+    const collect = (n) => { this.byId[n.id] = n; this.allNodes.push(n); (n.children||[]).forEach(collect); };
+    this.tree.forEach(collect);
+    this.state = {
+      open: false, query:'', tipOpen:false,
+      selected: new Set(['e1','e2','e4','e6','s11']),
+      expanded: new Set(['g1','s11']),
+      activeGrouping:'g1', activeSubgroup:'s11'
+    };
+    this._onDocDown = this._onDocDown.bind(this);
+  }
+  componentDidMount() { document.addEventListener('mousedown', this._onDocDown); }
+  componentWillUnmount() { document.removeEventListener('mousedown', this._onDocDown); }
+  _onDocDown(e) { if (!this.props.inline && this.root && !this.root.contains(e.target)) this.setState({ open:false, tipOpen:false }); }
+
+  nodeText(n) { return `${n.name} ${n.code} ${n.region} ${n.type} ${n.status||''}`.toLowerCase(); }
+  computeStm() {
+    this._stm = {}; const q = this.q;
+    const rec = (n) => { const kids = n.children||[]; let cm = false; for (const c of kids) { if (rec(c)) cm = true; } const m = q ? (this.nodeText(n).includes(q) || cm) : true; this._stm[n.id] = m; return m; };
+    this.tree.forEach(rec);
+  }
+  descendants(n) { let a = []; for (const c of (n.children||[])) { a.push(c); a = a.concat(this.descendants(c)); } return a; }
+  leafDesc(n) { const d = this.descendants(n); if (!d.length) return 1; return d.filter(x => !(x.children && x.children.length)).length; }
+  toggle(id) { this.setState(s => { const sel = new Set(s.selected); sel.has(id) ? sel.delete(id) : sel.add(id); return { selected: sel }; }); }
+  toggleExpand(id) { this.setState(s => { const e = new Set(s.expanded); e.has(id) ? e.delete(id) : e.add(id); return { expanded: e }; }); }
+  selectMany(ids) { this.setState(s => { const sel = new Set(s.selected); const all = ids.length > 0 && ids.every(id => sel.has(id)); ids.forEach(id => all ? sel.delete(id) : sel.add(id)); return { selected: sel }; }); }
+  selectSubtree(n) { this.selectMany(this.descendants(n).map(x => x.id)); }
+  buildVisible() {
+    const q = this.q; const out = [];
+    const rec = (nodes, level) => {
+      for (const n of nodes) {
+        const vis = q ? this._stm[n.id] : true; if (!vis) continue;
+        const kids = n.children || []; const hc = kids.length > 0;
+        const exp = hc && (q ? kids.some(c => this._stm[c.id]) : this.state.expanded.has(n.id));
+        out.push({ node:n, level, hasChildren:hc, expanded:exp });
+        if (exp) rec(kids, level + 1);
+      }
+    };
+    rec(this.tree, 0); return out;
+  }
+
+  renderVals() {
+    const primary = this.props.primary || '#2563eb';
+    const entityName = this.props.entityName || 'Establishments';
+    const fieldLabel = this.props.fieldLabel || 'Establishment Hierarchy';
+    const inline = !!this.props.inline;
+    const variant = this.props.variant || 'tree';
+    this.q = this.state.query.trim().toLowerCase();
+    this.computeStm();
+    const sel = this.state.selected;
+    const open = this.state.open;
+
+    const box = (checked, partial) =>
+      `width:19px;height:19px;border-radius:5px;flex:none;display:flex;align-items:center;justify-content:center;transition:all .12s;` +
+      ((checked || partial) ? `background:${primary};border:1px solid ${primary};` : `background:#fff;border:1.5px solid #cbd5e1;`);
+    const statusColor = (s) => s === 'Active' ? '#0f766e' : s === 'Pending' ? '#b45309' : s === 'Closed' ? '#94a3b8' : '#94a3b8';
+    const ROW_GRID = 'display:grid;grid-template-columns:minmax(200px,1.3fr) 110px 140px 120px 120px;';
+    const selAllPill = (active, partial) => `flex:none;font-size:10px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:99px;cursor:pointer;white-space:nowrap;` +
+      (active ? `background:#0f766e;color:#fff;border:1px solid #0f766e;` : partial ? `background:#fff;color:#0f766e;border:1px solid #5ea69d;` : `background:#fff;color:#64748b;border:1px solid #cbd5e1;`);
+
+    const vis = this.buildVisible();
+
+    // TREE rows
+    const treeRows = vis.map(v => {
+      const n = v.node, checked = sel.has(n.id), isLeaf = !v.hasChildren;
+      const ds = this.descendants(n), dSel = ds.filter(x => sel.has(x.id)).length, dTot = ds.length;
+      const saActive = dTot > 0 && dSel === dTot, saPartial = dSel > 0 && !saActive;
+      return {
+        id:n.id, name:n.name, code:n.code, region:n.region, typeLabel:n.type,
+        statusText: isLeaf ? n.status : `${this.leafDesc(n)} establishments`, statusColor: statusColor(isLeaf ? n.status : null),
+        hasChildren:v.hasChildren, isLeaf, chevronRotate: v.expanded ? '90deg' : '0deg', checked,
+        rowStyle: `${ROW_GRID}border-bottom:1px solid #f1f5f9;background:${checked ? '#eff6fe' : '#fff'};`,
+        firstCellStyle: `display:flex;align-items:center;gap:8px;padding:8px 10px 8px ${14 + v.level * 22}px;min-width:0;`,
+        boxStyle: box(checked, false),
+        nameStyle: `font-size:13px;color:${isLeaf ? '#1f2937' : '#0f172a'};font-weight:${isLeaf ? 500 : 600};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;`,
+        showSelAll: v.hasChildren, selAllText: saActive ? 'Clear' : 'All', selAllStyle: selAllPill(saActive, saPartial),
+        toggleCheck: (e) => { e.stopPropagation(); this.toggle(n.id); },
+        toggleExpand: (e) => { e.stopPropagation(); this.toggleExpand(n.id); },
+        selAll: (e) => { e.stopPropagation(); this.selectSubtree(n); }
+      };
+    });
+
+    // ACCORDION rows
+    const accRows = vis.map(v => {
+      const n = v.node, checked = sel.has(n.id);
+      const ds = this.descendants(n), dSel = ds.filter(x => sel.has(x.id)).length, dTot = ds.length;
+      const saActive = dTot > 0 && dSel === dTot, saPartial = dSel > 0 && !saActive;
+      const base = {
+        id:n.id, name:n.name, code:n.code, region:n.region, count: `${this.leafDesc(n)} establishments`,
+        checked, boxStyle: box(checked, false), chevronRotate: v.expanded ? '90deg' : '0deg',
+        toggleCheck: (e) => { e.stopPropagation(); this.toggle(n.id); },
+        toggleExpand: (e) => { e.stopPropagation(); this.toggleExpand(n.id); },
+        selAll: (e) => { e.stopPropagation(); this.selectSubtree(n); },
+        selAllText: saActive ? 'Clear all' : 'Select all',
+        selAllStyle: `flex:none;font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:99px;cursor:pointer;white-space:nowrap;` +
+          (saActive ? `background:#0f766e;color:#fff;border:1px solid #0f766e;` : saPartial ? `background:#fff;color:#0f766e;border:1px solid #5ea69d;` : `background:#fff;color:#475569;border:1px solid #cbd5e1;`)
+      };
+      if (v.level === 0) return { ...base, isGrp:true, isSub:false, isLeaf:false, headerStyle:`display:flex;align-items:center;gap:10px;padding:11px 14px;background:${checked ? '#e6effe' : '#eef2f8'};border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;` };
+      if (v.level === 1) return { ...base, isGrp:false, isSub:true, isLeaf:false, headerStyle:`display:flex;align-items:center;gap:10px;padding:9px 14px 9px 34px;background:${checked ? '#eff6fe' : '#f7f9fc'};border-bottom:1px solid #eef1f4;` };
+      return { ...base, isGrp:false, isSub:false, isLeaf:true, statusText:n.status, statusColor: statusColor(n.status),
+        rowStyle: `${ROW_GRID}border-bottom:1px solid #f1f5f9;background:${checked ? '#eff6fe' : '#fff'};`,
+        firstCellStyle: `display:flex;align-items:center;gap:8px;padding:8px 10px 8px 50px;min-width:0;`,
+        nameStyle: `font-size:13px;color:#1f2937;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;` };
+    });
+
+    // COLUMNS (Miller)
+    const mkParent = (n, activeId, go) => {
+      const checked = sel.has(n.id);
+      return {
+        id:n.id, name:n.name, meta:`${n.code} · ${this.leafDesc(n)} establishments`, checked, boxStyle: box(checked, false),
+        itemStyle: `display:flex;align-items:center;gap:9px;padding:9px 11px;cursor:pointer;border-bottom:1px solid #f4f6f8;background:${n.id === activeId ? '#eef4ff' : '#fff'};`,
+        nameStyle: `font-size:13px;font-weight:600;color:${n.id === activeId ? '#1d4ed8' : '#1f2937'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;`,
+        toggleCheck: (e) => { e.stopPropagation(); this.toggle(n.id); }, go }
+    };
+    const grpFiltered = this.tree.filter(g => this.q ? this._stm[g.id] : true);
+    let aG = this.state.activeGrouping; if (!grpFiltered.some(g => g.id === aG)) aG = grpFiltered[0] ? grpFiltered[0].id : null;
+    const aGNode = this.byId[aG];
+    const subFiltered = aGNode ? (aGNode.children || []).filter(s => this.q ? this._stm[s.id] : true) : [];
+    let aS = this.state.activeSubgroup; if (!subFiltered.some(s => s.id === aS)) aS = subFiltered[0] ? subFiltered[0].id : null;
+    const aSNode = this.byId[aS];
+    const estFiltered = aSNode ? (aSNode.children || []).filter(e => this.q ? this._stm[e.id] : true) : [];
+    const pane1 = grpFiltered.map(g => mkParent(g, aG, () => this.setState({ activeGrouping: g.id, activeSubgroup: null })));
+    const pane2 = subFiltered.map(s => mkParent(s, aS, () => this.setState({ activeSubgroup: s.id })));
+    const pane3 = estFiltered.map(n => {
+      const checked = sel.has(n.id);
+      return { id:n.id, name:n.name, meta:`${n.code} · ${n.region}`, status:n.status, statusColor: statusColor(n.status), checked, boxStyle: box(checked, false),
+        itemStyle: `display:flex;align-items:flex-start;gap:9px;padding:9px 11px;cursor:pointer;border-bottom:1px solid #f4f6f8;background:${checked ? '#eff6fe' : '#fff'};`,
+        toggleCheck: (e) => { e.stopPropagation(); this.toggle(n.id); }, toggle: () => this.toggle(n.id) };
+    });
+    const p1ids = pane1.map(x => x.id), p2ids = pane2.map(x => x.id), p3ids = pane3.map(x => x.id);
+    const allOf = (ids) => ids.length > 0 && ids.every(id => sel.has(id));
+
+    // field summary
+    const count = sel.size;
+    const allVisIds = vis.map(v => v.node.id);
+    const allChecked = allVisIds.length > 0 && allVisIds.every(id => sel.has(id));
+    const someChecked = !allChecked && allVisIds.some(id => sel.has(id));
+    let summaryText = '';
+    if (count === 1) { const only = this.allNodes.find(n => sel.has(n.id)); summaryText = only ? only.name : ''; }
+    else if (count > 1) summaryText = `${count} selected`;
+
+    return {
+      primary, entityName, fieldLabel,
+      fieldBorder: open ? primary : '#cbd5e1',
+      query: this.state.query, open,
+      caretRotate: open ? '180deg' : '0deg',
+      hasSelection: count > 0, summaryText,
+      tipOpen: this.state.tipOpen && count > 0,
+      countLabel: `${count} selected`,
+      selectedItems: this.allNodes.filter(n => sel.has(n.id)).map(n => ({ code:n.code, desc:n.name, level:n.type, remove: (e) => { e.stopPropagation(); this.toggle(n.id); } })),
+      panelStyle: inline
+        ? 'position:static;margin-top:8px;width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 1px 2px rgba(15,23,42,.05);overflow:hidden;'
+        : 'position:absolute;top:46px;left:0;width:760px;max-width:96vw;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 12px 32px -8px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.08);z-index:30;overflow:hidden;',
+      isTree: variant === 'tree', isAccordion: variant === 'accordion', isColumns: variant === 'columns',
+      showGlobalSelectAll: variant !== 'columns',
+      crumbText: `${aGNode ? aGNode.name : '—'}  ›  ${aSNode ? aSNode.name : '—'}`,
+      treeRows, accRows, noResults: vis.length === 0,
+      pane1, pane2, pane3, pane3Empty: pane3.length === 0,
+      pane1Lab: allOf(p1ids) ? 'Clear' : 'All', pane2Lab: allOf(p2ids) ? 'Clear' : 'All', pane3Lab: allOf(p3ids) ? 'Clear' : 'All',
+      selPane1: () => this.selectMany(p1ids), selPane2: () => this.selectMany(p2ids), selPane3: () => this.selectMany(p3ids),
+      allBoxStyle: box(allChecked, someChecked),
+      allChecked, someChecked,
+      selectAllLabel: allChecked ? 'Deselect all' : 'Select all',
+      selectAllVisible: () => this.selectMany(allVisIds),
+      onFocus: () => this.setState({ open: true }),
+      toggleOpen: (e) => { e.preventDefault(); this.setState(s => ({ open: !s.open })); },
+      toggleTip: (e) => { e.stopPropagation(); this.setState(s => ({ tipOpen: !s.tipOpen })); },
+      onInput: (e) => this.setState({ query: e.target.value, open: true }),
+      clearAll: (e) => { e.stopPropagation(); this.setState({ selected: new Set(), query: '' }); },
+      setRoot: (el) => { this.root = el; }
+    };
+  }
+}
+</script>
+</body>
+</html>
