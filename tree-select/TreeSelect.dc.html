@@ -24,7 +24,7 @@
   <div style="font-size:12px;font-weight:600;color:#64748b;letter-spacing:.02em;text-transform:uppercase;margin-bottom:8px;">{{ fieldLabel }}</div>
 
   <!-- FIELD -->
-  <div style="position:relative;">
+  <div ref="{{ setField }}" style="position:relative;">
     <div style="display:flex;align-items:stretch;border:1px solid {{ fieldBorder }};border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04);">
       <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
         <div onClick="{{ toggleTip }}" title="Show selected" style="flex:none;max-width:260px;display:flex;align-items:center;gap:6px;padding:0 11px;background:#f4f6f9;border-right:1px solid #e2e8f0;cursor:pointer;user-select:none;" style-hover="background:#eef1f5;">
@@ -41,8 +41,8 @@
         onInput="{{ onInput }}"
         onFocus="{{ onFocus }}"
         placeholder="Search {{ entityName }}"
-        style="flex:1;min-width:0;border:none;outline:none;font:inherit;font-size:14px;color:#1f2937;padding:10px 4px 10px 13px;background:transparent;" />
-      <button onClick="{{ toggleOpen }}" aria-label="Toggle options" style="width:40px;border:none;cursor:pointer;background:{{ primary }};display:flex;align-items:center;justify-content:center;" style-hover="filter:brightness(.94);">
+        style="flex:1;min-width:0;border:none;outline:none;font:inherit;font-size:15px;color:#1f2937;padding:7px 12px;background:transparent;" />
+      <button onClick="{{ toggleOpen }}" aria-label="Toggle options" style="width:42px;border:none;cursor:pointer;background:{{ primary }};display:flex;align-items:center;justify-content:center;" style-hover="filter:brightness(.94);">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="transform:rotate({{ caretRotate }});transition:transform .2s;"><path d="M4 6l4 4 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -313,10 +313,12 @@ class Component extends DCLogic {
       activeGrouping:'g1', activeSubgroup:'s11'
     };
     this._onDocDown = this._onDocDown.bind(this);
+    this._onReposition = this._onReposition.bind(this);
   }
-  componentDidMount() { document.addEventListener('mousedown', this._onDocDown); }
-  componentWillUnmount() { document.removeEventListener('mousedown', this._onDocDown); }
+  componentDidMount() { document.addEventListener('mousedown', this._onDocDown); window.addEventListener('resize', this._onReposition); window.addEventListener('scroll', this._onReposition, true); }
+  componentWillUnmount() { document.removeEventListener('mousedown', this._onDocDown); window.removeEventListener('resize', this._onReposition); window.removeEventListener('scroll', this._onReposition, true); }
   _onDocDown(e) { if (!this.props.inline && this.root && !this.root.contains(e.target)) this.setState({ open:false, tipOpen:false }); }
+  _onReposition() { if (!this.props.inline && this.state.open) this.forceUpdate(); }
 
   nodeText(n) { return `${n.name} ${n.code} ${n.region} ${n.type} ${n.status||''}`.toLowerCase(); }
   computeStm() {
@@ -325,6 +327,24 @@ class Component extends DCLogic {
     this.tree.forEach(rec);
   }
   descendants(n) { let a = []; for (const c of (n.children||[])) { a.push(c); a = a.concat(this.descendants(c)); } return a; }
+  // Floating (non-inline) panel placement — mirrors the lookup-table panel:
+  // fixed-positioned and anchored to the field rect, flips above/below by
+  // available space, width capped to the viewport so it never overflows right,
+  // height capped at 70vh.
+  floatPanelStyle() {
+    const base = 'background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 12px 32px -8px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.08);z-index:9998;overflow:hidden;display:flex;flex-direction:column;';
+    const fr = this.field ? this.field.getBoundingClientRect() : null;
+    if (!fr) return 'position:absolute;top:46px;left:0;width:760px;max-width:96vw;' + base;
+    const vh = window.innerHeight, vw = window.innerWidth;
+    const spaceBelow = vh - fr.bottom - 8, spaceAbove = fr.top - 8, cap = vh * 0.7;
+    let vert;
+    if (spaceBelow >= spaceAbove) vert = `top:${Math.round(fr.bottom + 4)}px;bottom:auto;max-height:${Math.round(Math.min(cap, spaceBelow))}px;`;
+    else vert = `top:auto;bottom:${Math.round(vh - fr.top + 4)}px;max-height:${Math.round(Math.min(cap, spaceAbove))}px;`;
+    const left = Math.round(fr.left);
+    const maxW = Math.max(280, Math.round(vw - left - 12));
+    const width = Math.min(760, maxW);
+    return `position:fixed;left:${left}px;${vert}width:${width}px;max-width:${maxW}px;` + base;
+  }
   leafDesc(n) { const d = this.descendants(n); if (!d.length) return 1; return d.filter(x => !(x.children && x.children.length)).length; }
   toggle(id) { this.setState(s => { const sel = new Set(s.selected); sel.has(id) ? sel.delete(id) : sel.add(id); return { selected: sel }; }); }
   toggleExpand(id) { this.setState(s => { const e = new Set(s.expanded); e.has(id) ? e.delete(id) : e.add(id); return { expanded: e }; }); }
@@ -455,7 +475,8 @@ class Component extends DCLogic {
       selectedItems: this.allNodes.filter(n => sel.has(n.id)).map(n => ({ code:n.code, desc:n.name, level:n.type, remove: (e) => { e.stopPropagation(); this.toggle(n.id); } })),
       panelStyle: inline
         ? 'position:static;margin-top:8px;width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 1px 2px rgba(15,23,42,.05);overflow:hidden;'
-        : 'position:absolute;top:46px;left:0;width:760px;max-width:96vw;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 12px 32px -8px rgba(15,23,42,.22),0 2px 6px rgba(15,23,42,.08);z-index:30;overflow:hidden;',
+        : this.floatPanelStyle(),
+      setField: (el) => { this.field = el; },
       isTree: variant === 'tree', isAccordion: variant === 'accordion', isColumns: variant === 'columns',
       showGlobalSelectAll: variant !== 'columns',
       crumbText: `${aGNode ? aGNode.name : '—'}  ›  ${aSNode ? aSNode.name : '—'}`,

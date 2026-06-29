@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tree A — indented tree table</title>
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <!--
+      This page lives in tree-select/ so that <dc-import name="TreeSelect" />
+      resolves to ./TreeSelect.dc.html (COMPONENT_DIR is the page's own dir).
+      Renders the TreeSelect "A" variant (variant="tree", the indented tree
+      table) natively via dc-import. Uses the same centered layout as the v4
+      lookup-table page (lookup-v4.html): #f7f8fa background, centered column,
+      a max-width:300px heading block + field block, no card.
+    -->
+    <x-dc>
+      <helmet>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="min-height:100vh;background:#f7f8fa;font-family:Inter,'Segoe UI',system-ui,-apple-system,sans-serif;color:#1f2937;padding:32px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;"
+      >
+        <div style="width:100%;max-width:300px;margin-bottom:4px;">
+          <div
+            style="font-size:22px;font-weight:700;color:#0f172a;letter-spacing:-.01em;"
+          >
+            Tree A — indented tree table
+          </div>
+          <div style="margin-top:4px;font-size:14px;color:#64748b;">
+            TreeSelect indented tree-table (variant A).
+          </div>
+        </div>
+
+        <div style="width:100%;max-width:300px;">
+          <dc-import
+            name="TreeSelect"
+            variant="tree"
+            inline="{{ false }}"
+            primary="#2563eb"
+            entity-name="Establishments"
+            field-label="Establishment Hierarchy"
+            hint-size="100%,500px"
+          ></dc-import>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>
